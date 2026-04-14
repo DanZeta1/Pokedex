@@ -1,19 +1,10 @@
-import Card from '../Cards/Card';
-import CardHeader from '../Cards/CardHeader';
-import CardBody from '../Cards/CardBody';
-import CardFooter from '../Cards/CardFooter';
 import { useNavigate } from 'react-router';
 
-const PokemonCard = (
-  {
-    data
-  }
-) => {
+const PokemonCard = ({ data }) => {
   const redirectTo = useNavigate();
 
-  const getStat = (statName) => (
-    data?.stats?.find((item) => item?.stat?.name === statName)?.base_stat ?? '-'
-  );
+  const getStat = (statName) =>
+    data?.stats?.find((item) => item?.stat?.name === statName)?.base_stat ?? '-';
 
   const hp = getStat('hp');
   const atk = getStat('attack');
@@ -22,7 +13,7 @@ const PokemonCard = (
   const types = data?.types?.map((item) => item?.type?.name).filter(Boolean) ?? [];
   const primaryType = data?.types?.find((item) => item?.slot === 1)?.type?.name ?? types[0];
 
-  const headerTypeColor = {
+  const typeColor = {
     normal: 'bg-stone-500',
     fire: 'bg-orange-500',
     water: 'bg-blue-500',
@@ -40,17 +31,16 @@ const PokemonCard = (
     dragon: 'bg-indigo-500',
     dark: 'bg-neutral-800',
     steel: 'bg-slate-500',
-    fairy: 'bg-rose-400'
+    fairy: 'bg-rose-400',
   };
 
-  const headerBgClass = headerTypeColor[primaryType] ?? 'bg-green-600';
+  const headerBgClass = typeColor[primaryType] ?? 'bg-green-600';
 
-  const formatText = (value) => (
+  const formatText = (value) =>
     value
       ?.split('-')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  );
+      .join(' ');
 
   const imageUrl =
     data?.sprites?.other?.['official-artwork']?.front_default ||
@@ -58,63 +48,51 @@ const PokemonCard = (
     `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${data?.id}.png`;
 
   return (
-    <Card
-      cardHeader={(
-        <CardHeader>
-          <div className={`flex flex-col justify-center items-center w-full ${headerBgClass} p-2`}>
-            <img
-              className="w-24 h-24 translate-y-1/3 object-cover rounded-full shadow-2xl bg-white"
-              src={imageUrl}
-              alt={data?.name || 'pokemon'}
-            />
-          </div>
-        </CardHeader>
-      )}
-      cardBody={(
-        <CardBody>
-          <section className="mt-8 px-4">
-            <div className="flex justify-between items-center">
-              <span className="font-bold">{`#${data?.id ?? '-'}`}</span>
-              <span className="flex gap-2">
-                {types.map((typeName) => (
-                  <span key={typeName} className={`inline-block px-3 py-2 ${headerTypeColor[typeName] ?? 'bg-green-600'} text-white rounded-sm`}>
-                    {formatText(typeName)}
-                  </span>
-                ))}
-              </span>
-            </div>
-            <div>
-              <h2 className="text-center py-4 text-2xl font-bold">{formatText(data?.name) || '-'}</h2>
-            </div>
-            <div className="flex rounded-xl bg-teal-100 px-2 py-4 justify-center w-full">
-              <span className="flex flex-1 flex-col items-center">
-                <span className="text-red-800 font-bold">HP</span>
-                <span>{hp}</span>
-              </span>
-              <span className="flex flex-1 flex-col  items-center">
-                <span className="text-red-800 font-bold">ATK</span>
-                <span>{atk}</span>
-              </span>
-              <span className="flex flex-1 flex-col  items-center">
-                <span className="text-blue-600 font-bold">DEF</span>
-                <span>{def}</span>
-              </span>
-            </div>
-          </section>
-        </CardBody>
-      )}
-      cardFooter={(
-        <CardFooter>
-          <section className="flex">
-            <button
-              className="flex-1 mx-4 mt-8 mb-2 px-4 py-3 bg-green-600 text-white font-bold rounded-sm"
-              onClick={() => { redirectTo(`/pokemon/${data?.id}`) }}
-            >Detalles</button>
-          </section>
-        </CardFooter>
-      )}
-    />
+    <div
+      className="flex items-center w-full max-w-2xl bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+      onClick={() => redirectTo(`/pokemon/${data?.id}`)}
+    >
+      <div className={`${headerBgClass} flex items-center justify-center w-20 h-20 shrink-0`}>
+        <img
+          className="w-16 h-16 object-contain"
+          src={imageUrl}
+          alt={data?.name || 'pokemon'}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1 flex-1 min-w-0 px-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-400 font-semibold">{`#${data?.id ?? '-'}`}</span>
+          <h2 className="text-base font-bold text-gray-800 truncate">{formatText(data?.name) || '-'}</h2>
+        </div>
+        <div className="flex gap-1 flex-wrap">
+          {types.map((typeName) => (
+            <span
+              key={typeName}
+              className={`text-xs px-2 py-0.5 ${typeColor[typeName] ?? 'bg-green-600'} text-white rounded-full`}
+            >
+              {formatText(typeName)}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex gap-4 pr-4 shrink-0 text-center">
+        <div className="flex flex-col">
+          <span className="text-xs font-bold text-red-700">HP</span>
+          <span className="text-sm text-gray-700">{hp}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-xs font-bold text-red-700">ATK</span>
+          <span className="text-sm text-gray-700">{atk}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-xs font-bold text-blue-600">DEF</span>
+          <span className="text-sm text-gray-700">{def}</span>
+        </div>
+      </div>
+    </div>
   );
-}
+};
 
 export default PokemonCard;
